@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="photos_container">
+      <% photoInfos.map((photoInfo, index) => { %>
+      <div class="photo_container">
+        <p class="photo_name"><%= photoInfo.name %></p>
+        <img
+          class="photo"
+          id="test"
+          src="<%= photoInfo.srcUrl %>"
+          alt="<%= photoInfo.altText %>`"
+        />
+        <div class="vote_btn_container">
+          <button
+            class="btn btn-primary"
+            id="<%= index %>"
+            onclick="castVote('<%= photoInfo.id %>', '<%= photoInfo.votes %>')"
+          >
+            Vote
+          </button>
+          <p>Votes: <%= photoInfo.votes %></p>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </body>
+  <script src="main.js"></script>
+</html>
