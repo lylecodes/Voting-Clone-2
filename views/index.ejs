@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="photos_container">
@@ -15,21 +16,23 @@
           class="photo"
           id="test"
           src="<%= photoInfo.srcUrl %>"
-          alt="<%= photoInfo.altText %>`"
+          alt="<%= photoInfo.altText %>"
         />
         <div class="vote_btn_container">
           <button
             class="btn btn-primary"
             id="<%= index %>"
-            onclick="castVote('<%= photoInfo.id %>', '<%= photoInfo.votes %>')"
+            onclick="castVote('<%= photoInfo.id %>')"
           >
             Vote
           </button>
-          <p>Votes: <%= photoInfo.votes %></p>
+          <p id="votes">
+            Votes: <%= photoInfo.votes %>, Total Votes: <%= votes %>
+          </p>
         </div>
         <% }); %>
       </div>
     </div>
+    <script src="main.js"></script>
   </body>
-  <script src="main.js"></script>
 </html>

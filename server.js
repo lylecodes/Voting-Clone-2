@@ -25,29 +25,36 @@ MongoClient.connect(connectionStr).then((client) => {
       .find()
       .toArray()
       .then((data) => {
-        res.render("index.ejs", { photoInfos: data });
+        let totalVotes = getTotalVotes(data);
+        res.render("index.ejs", { photoInfos: data, votes: totalVotes });
       });
   });
 
   app.put("/photos", (req, res) => {
     const id = parseInt(req.body.id);
-    const votes = parseInt(req.body.votes);
 
     photosCollection
       .findOneAndUpdate(
         { id: id },
         {
-          $set: {
-            votes: votes,
+          $inc: {
+            votes: 1,
           },
         },
         { upsert: false }
       )
       .then((result) => {
-        res.json("Success");
-        console.log(id);
-        console.log(votes);
+        return res.json("success");
       })
       .catch((err) => console.error(err));
   });
 });
+
+const getTotalVotes = (data) => {
+  let total = 0;
+
+  data.map((obj) => {
+    total += obj.votes;
+  });
+  return total;
+};

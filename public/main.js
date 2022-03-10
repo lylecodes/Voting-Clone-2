@@ -11,16 +11,20 @@ const castVote = (id, votes) => {
       if (res.ok) return res.json();
     })
     .then((response) => {
+      localStorage.setItem("photo vote", "voted");
       window.location.reload(true);
     });
 };
 
-let hasVoted = localStorage.getItem("voted");
-if (!hasVoted) {
+let hasVoted = localStorage.getItem("photo vote");
+if (hasVoted) {
   const btns = document.querySelectorAll(".btn");
+  const voteMsgs = document.querySelectorAll("#votes");
+  voteMsgs.forEach((msg) => {
+    msg.style.display = "block";
+  });
+
   btns.forEach((btn) => {
-    btn.disabled = true;
-    const totalVotes = getTotalVotes();
-    btn.innerHTML = `Votes`;
+    btn.style.display = "none";
   });
 }
