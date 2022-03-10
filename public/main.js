@@ -18,12 +18,12 @@ const castVote = (id, votes) => {
 
 let hasVoted = localStorage.getItem("photo vote");
 if (hasVoted) {
-  const btns = document.querySelectorAll(".btn");
-  const voteMsgs = document.querySelectorAll("#votes");
+  const voteMsgs = document.querySelectorAll(".votes");
   voteMsgs.forEach((msg) => {
     msg.style.display = "block";
   });
 
+  const btns = document.querySelectorAll(".btn");
   btns.forEach((btn) => {
     btn.style.display = "none";
   });

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="styles.css" />
+    <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
     <div class="photos_container">
@@ -14,7 +15,6 @@
         <p class="photo_name"><%= photoInfo.name %></p>
         <img
           class="photo"
-          id="test"
           src="<%= photoInfo.srcUrl %>"
           alt="<%= photoInfo.altText %>"
         />
@@ -26,13 +26,38 @@
           >
             Vote
           </button>
-          <p id="votes">
+          <p id="<%= index %>" class="votes">
             Votes: <%= photoInfo.votes %>, Total Votes: <%= votes %>
           </p>
         </div>
         <% }); %>
       </div>
     </div>
+
+    <script>
+      var socket = io();
+
+      socket.on("vote-to-client", (photoId) => {
+        const voteStrs = document.querySelectorAll(".votes");
+        voteStrs.forEach((obj) => {
+          const str = obj.innerHTML;
+          const tokens = str.split(": ");
+          let curVotes = parseInt(tokens[1]);
+          if (parseInt(photoId) === parseInt(obj.id)) curVotes++;
+          let totalVotes = parseInt(tokens[2]) + 1;
+          if (photoId === parseInt(obj.id));
+          obj.innerHTML = `Votes: ${curVotes}, Total Votes: ${totalVotes}`;
+        });
+      });
+
+      const btns = document.querySelectorAll(".btn");
+      btns.forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          alert("sending vote to server");
+          socket.emit("vote-to-server", e.target.id);
+        });
+      });
+    </script>
     <script src="main.js"></script>
   </body>
 </html>
