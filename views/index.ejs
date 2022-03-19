@@ -5,34 +5,107 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="styles.css" />
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/moment"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
   </head>
   <body>
+    <header>
+      <%- include('partials/nav_bar') %>
+      <h1 class="heading">Vote on your favorite photo!</h1>
+      <h5 class="vote-msg"></h5>
+    </header>
     <div class="photos_container">
       <% photoInfos.map((photoInfo, index) => { %>
-      <div class="photo_container">
-        <p class="photo_name"><%= photoInfo.name %></p>
+      <div id="<%= index %>" class="photo_container <%= index %>">
+        <% if (user.photo.equals(photoInfo._id)) { %>
+        <script>
+          const index = "<%= index %>";
+          const selectedPhoto = document.getElementsByClassName(
+            "photo_container " + index
+          );
+          selectedPhoto[0].setAttribute(
+            "class",
+            "photo_container selected_photo"
+          );
+        </script>
+        <% } %>
         <img
           class="photo"
           src="<%= photoInfo.srcUrl %>"
           alt="<%= photoInfo.altText %>"
         />
+        <p class="photo_name"><%= photoInfo.name %></p>
         <div class="vote_btn_container">
-          <button
+          <a
             class="btn btn-primary"
-            id="<%= index %>"
-            onclick="castVote('<%= photoInfo.id %>')"
+            type="button"
+            href="/vote/<%= user._id %>/<%= photoInfo._id %>"
+            >Vote</a
           >
-            Vote
-          </button>
+          <a
+            class="btn btn-danger"
+            type="button"
+            href="/candidate/delete/<%= photoInfo._id %>"
+            >Delete</a
+          >
           <p id="<%= index %>" class="votes">
-            Votes: <%= photoInfo.votes %>, Total Votes: <%= votes %>
+            Votes: <%= photoInfo.votes %>, Total Votes:
           </p>
         </div>
-        <% }); %>
       </div>
+      <% }); %>
     </div>
+    <script>
+      const voteHeaderMsg = document.querySelector(".vote-msg");
+      const voteMsgs = document.querySelectorAll(".votes");
+      const voteBtns = document.querySelectorAll(".btn");
+      const photoVoteId = "<%= user.photoVoteId %>";
+      const dateRegistered = "<%= dateRegistered %>";
+      const endDate = moment(dateRegistered).add(10000, "minutes");
+      let minDiff = endDate.diff(moment(), "minutes");
+      let secDiff = endDate.diff(moment(), "seconds");
+      let voteExpired = minDiff <= 0 && secDiff <= 0;
+
+      if (!voteExpired && photoVoteId === "") {
+        const displayRemainingTime = () => {
+          minDiff = endDate.diff(moment(), "minutes");
+          secDiff = endDate.diff(moment(), "seconds");
+          voteHeaderMsg.innerHTML = `Your vote lasts for another ${minDiff} minutes and ${
+            secDiff % 60
+          } seconds`;
+
+          if (minDiff <= 0 && secDiff <= 0) {
+            window.location.reload();
+          }
+        };
+        setInterval(() => displayRemainingTime(), 1000);
+      } else {
+        const totalVotes = "total votes";
+
+        voteBtns.forEach((btn) => {
+          btn.style.display = "none";
+        });
+
+        voteMsgs.forEach((msg) => {
+          msg.style.display = "block";
+        });
+
+        if (photoVoteId !== "") {
+          voteHeaderMsg.innerHTML = "You voted!";
+        } else {
+          voteHeaderMsg.innerHTML = "Your vote has expired";
+        }
+      }
+    </script>
 
     <script>
       var socket = io();
@@ -53,11 +126,9 @@
       const btns = document.querySelectorAll(".btn");
       btns.forEach((btn) => {
         btn.addEventListener("click", (e) => {
-          alert("sending vote to server");
           socket.emit("vote-to-server", e.target.id);
         });
       });
     </script>
-    <script src="main.js"></script>
   </body>
 </html>
